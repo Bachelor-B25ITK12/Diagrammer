@@ -1,0 +1,15 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Sequence Diagram for the Manual version of the Application
+
+' Actors '
+actor           User            as User
+participant     Frontend        as Frontend
+participant     Backend         as Backend
+
+
+
+
+
+@enduml

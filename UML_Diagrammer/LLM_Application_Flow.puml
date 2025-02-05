@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+' This is for the LLM version of the application '
+title Sequence Diagram for the LLM version of the Application
+
+' Actors '
+actor           User            as User
+participant     Frontend        as Frontend
+participant     Backend         as Backend
+participant     Generator       as Generator
+participant     API             as API
+
+' Connections between participants '
+User        ->      Frontend    :   Chooses Module
+Frontend    ->      Backend     :   Post:/create
+Backend     ->      Generator   :   Create prompt
+Generator   ->      API         :   Send prompt
+API         -->     Backend     :   Response json
+Backend     ->      Backend     :   Convert to module object
+Backend     -->     Frontend    :   Send module code
+Frontend    -->     User        :   Display module code
+User        ->      Frontend    :   Accept / Verify Code
+Frontend    ->      Backend     :   Post:/add
+Backend     ->      Backend     :   Add module to project
+Backend     -->     Frontend    :   Confirm addition of module
+Frontend    -->     User        :   Confirm addition of module
+
+@enduml
