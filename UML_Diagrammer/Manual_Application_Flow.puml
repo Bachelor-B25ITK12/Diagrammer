@@ -7,9 +7,14 @@ title Sequence Diagram for the Manual version of the Application
 actor           User            as User
 participant     Frontend        as Frontend
 participant     Backend         as Backend
+database        Database        as Database
 
-
-
-
+User        ->      Frontend        :   Selects module from list
+Frontend    ->      Backend         :   Requests module
+Backend     ->      Database        :   Requests module
+Database    -->     Backend         :   Returns module
+Backend     ->      Backend         :   Finds correct table/data
+Backend     -->     Frontend        :   Sends table
+Frontend    -->     User            :   Shows user the table
 
 @enduml
