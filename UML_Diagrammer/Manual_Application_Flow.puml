@@ -9,12 +9,17 @@ participant     Frontend        as Frontend
 participant     Backend         as Backend
 database        Database        as Database
 
-User        ->      Frontend        :   Selects module from list
-Frontend    ->      Backend         :   Requests module
-Backend     ->      Database        :   Requests module
-Database    -->     Backend         :   Returns module
-Backend     ->      Backend         :   Finds correct table/data
-Backend     -->     Frontend        :   Sends table
-Frontend    -->     User            :   Shows user the table
+User        ->      Frontend        :   Selects PaaS (App Service)
+Frontend    ->      Backend         :   Requests modules
+Backend     ->      Database        :   Requests modules
+Database    -->     Backend         :   Returns modules
+Backend     ->      Backend         :   Finds correct input tables for each module
+Backend     -->     Frontend        :   Sends input tables
+Frontend    -->     User            :   Shows user the input tables
+User        ->      Frontend        :   User fills in the input tables
+Frontend    ->      Backend         :   Sends filled input tables
+Backend     ->      Backend         :   Generates complete terraform code
+Backend     -->     Frontend        :   Returns complete terraform code
+Frontend    -->     User            :   Returns complete terraform code
 
 @enduml

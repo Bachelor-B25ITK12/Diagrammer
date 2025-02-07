@@ -5,25 +5,38 @@
 title Sequence Diagram for the LLM version of the Application
 
 ' Actors '
-actor           User            as User
-participant     Frontend        as Frontend
-participant     Backend         as Backend
-participant     Generator       as Generator
-participant     API             as API
+actor           User            as  User
+participant     Frontend        as  Frontend
+participant     Backend         as  Backend
+participant     Generator       as  Generator
+participant     API             as  API
+participant     Azure           as  Azure
+database        Database        as  Database
 
 ' Connections between participants '
-User        ->      Frontend    :   Chooses Module
+User        ->      Frontend    :   Fills out parameters \nin input table
 Frontend    ->      Backend     :   Post:/create
-Backend     ->      Generator   :   Create prompt
-Generator   ->      API         :   Send prompt
-API         -->     Backend     :   Response json
-Backend     ->      Backend     :   Convert to module object
-Backend     -->     Frontend    :   Send module code
-Frontend    -->     User        :   Display module code
-User        ->      Frontend    :   Accept / Verify Code
-Frontend    ->      Backend     :   Post:/add
-Backend     ->      Backend     :   Add module to project
-Backend     -->     Frontend    :   Confirm addition of module
-Frontend    -->     User        :   Confirm addition of module
+Backend     ->      Generator   :   Sends users parameters
+Generator   ->      Generator   :   Generates a prompt based \non filled parameters
+Generator   ->      API         :   Sends complete prompt to LLM
+API         -->     Generator   :   Response json
+
+' Verification Step '
+loop Up to N Attempts (User-defined Threshold)
+    Generator   ->      Azure       :   Verifies the complete\nterraform code
+    Azure       -->     Generator   :   Verification response
+end loop
+
+alt Verification Successful
+    Generator   ->      Backend     :   Sends complete terraform code
+    Backend     -->     Frontend    :   Sends complete terraform code
+    Frontend    -->     User        :   Display complete terraform code
+    User        ->      Frontend    :   Accept / Verify Code
+    Frontend    ->      Backend     :   Post:/add
+    Backend     ->      Database    :   Add complete terraform code\nto log/database
+else Verification threshold reached
+    Generator   -->     Frontend    :   Verification failed message
+    Frontend    -->     User        :   Display "Verification Failed" message
+end alt
 
 @enduml
