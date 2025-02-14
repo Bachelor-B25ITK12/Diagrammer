@@ -1,25 +1,54 @@
 @startuml
 'https://plantuml.com/sequence-diagram
 
-title Sequence Diagram for the Manual version of the Application
+title Sekvensdiagram for den manuelle genereringsprosessen i applikasjonen
 
-' Actors '
-actor           User            as User
+' Aktører '
+actor           Bruker          as Bruker
 participant     Frontend        as Frontend
 participant     Backend         as Backend
+participant     Generator       as Generator
 database        Database        as Database
+participant     Azure           as Azure
 
-User        ->      Frontend        :   Selects PaaS (App Service)
-Frontend    ->      Backend         :   Requests modules
-Backend     ->      Database        :   Requests modules
-Database    -->     Backend         :   Returns modules
-Backend     ->      Backend         :   Finds correct input tables for each module
-Backend     -->     Frontend        :   Sends input tables
-Frontend    -->     User            :   Shows user the input tables
-User        ->      Frontend        :   User fills in the input tables
-Frontend    ->      Backend         :   Sends filled input tables
-Backend     ->      Backend         :   Generates complete terraform code
-Backend     -->     Frontend        :   Returns complete terraform code
-Frontend    -->     User            :   Returns complete terraform code
+Bruker        ->      Frontend        :   Velger PaaS (App Service)
+Frontend      ->      Backend         :   Forespør valgt PaaS
+Backend       ->      Backend         :   Finner riktige inputfelter for PaaS
+Backend       ->      Frontend        :   Sender riktige inputfelter
+Frontend      -->     Bruker          :   Vist inputfeltene til bruker
+Bruker        ->      Frontend        :   Bruker fyller ut inputfeltene
+Frontend      ->      Backend         :   Sender innputtdata
+Backend       ->      Generator       :   Sender inputdata med instruksjoner
+
+Generator     ->      Database        :   Forespør moduler
+Database      -->     Generator       :   Returnerer moduler
+Generator     ->      Generator       :   Genererer komplett IaC
+Generator     ->      Generator       :   Verifiserer IaC
+Generator     -->     Backend         :   Sender komplett IaC
+
+Backend       -->     Frontend        :   Returnerer IaC
+Frontend      -->     Bruker          :   Vist IaC
+Bruker        ->      Frontend        :   Godtar/Avviser IaC
+
+alt Bruker godtar IaC
+    Frontend    ->      Backend         :   Bekrefter godkjenning av kode
+    Backend     ->      Database        :   Lagrer godkjent IaC
+    Bruker      ->      Frontend        :   Forespør distribusjon av IaC til Azure
+    Frontend    ->      Backend         :   Sender distribusjonsforespørsel
+    Backend     ->      Azure           :   Distribuerer IaC
+
+    alt Distribusjon vellykket
+        Azure       ->      Backend         :   Bekrefter distribusjon
+        Backend     ->      Frontend        :   Bekrefter distribusjon
+        Frontend    -->     Bruker          :   Viser suksessmelding
+    else Distribusjon feilet
+        Azure       ->      Backend         :   Feilmelding
+        Backend     ->      Frontend        :   Sender feilmelding
+        Frontend    -->     Bruker          :   Viser feilmelding og ber om ny handling
+    end
+else Bruker avviser IaC
+    Bruker      ->      Frontend        :   Forespør ny generering
+    Frontend    ->      Backend         :   Starter genereringsprosessen på nytt
+end
 
 @enduml
