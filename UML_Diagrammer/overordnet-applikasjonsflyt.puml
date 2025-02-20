@@ -1,0 +1,19 @@
+@startuml
+
+rectangle Frontend as FE #LightBlue
+rectangle Backend as BE #LightGray
+rectangle Database as DB #LightPink
+rectangle Azure as AZ #LightGreen
+
+package "Generatorer" {
+  rectangle "Generator 1" as G1 #LightYellow
+  rectangle "Generator 2" as G2 #LightYellow
+}
+
+FE -> BE : (1)\nBruker velger PaaS og Sender utfylt inputfelter
+BE --> G1 : (2)\nSender instruksjoner
+G1 --> BE : (3)\nSender generert IaC
+BE -> FE : (4)\nVidere sender generert IaC
+BE -> DB : (5)\nGodkjent kode lagres
+BE -> AZ :(6)\nGodkjent kode utplasseres
+@enduml
