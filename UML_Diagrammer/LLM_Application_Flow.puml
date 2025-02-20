@@ -1,11 +1,11 @@
 @startuml
 'https://plantuml.com/sequence-diagram
 
-' This is for the LLM version of the application '
-title Sequence Diagram for the LLM version of the Application
+' Dette er for LLM-versjonen av applikasjonen '
+title Sekvensdiagram for LLM-versjonen av applikasjonen
 
-' Actors '
-actor           User            as  User
+' Aktører '
+actor           Bruker          as  Bruker
 participant     Frontend        as  Frontend
 participant     Backend         as  Backend
 participant     Generator       as  Generator
@@ -13,30 +13,51 @@ participant     API             as  API
 participant     Azure           as  Azure
 database        Database        as  Database
 
-' Connections between participants '
-User        ->      Frontend    :   Fills out parameters \nin input table
-Frontend    ->      Backend     :   Post:/create
-Backend     ->      Generator   :   Sends users parameters
-Generator   ->      Generator   :   Generates a prompt based \non filled parameters
-Generator   ->      API         :   Sends complete prompt to LLM
-API         -->     Generator   :   Response json
+Bruker        ->      Frontend        :   Velger PaaS (App Service)
+Frontend      ->      Backend         :   Forespør valgt PaaS
+Backend       ->      Backend         :   Finner riktige inputfelter for PaaS
+Backend       ->      Frontend        :   Sender riktige inputfelter
+Frontend      -->     Bruker          :   Vist inputfeltene til bruker
+Bruker        ->      Frontend        :   Bruker fyller ut inputfeltene
+Frontend      ->      Backend         :   Sender innputtdata
+Backend       ->      Generator       :   Sender inputdata med instruksjoner
 
-' Verification Step '
-loop Up to N Attempts (User-defined Threshold)
-    Generator   ->      Azure       :   Verifies the complete\nterraform code
-    Azure       -->     Generator   :   Verification response
+' Kommunikasjon med LLM API for generering av Terraform-kode '
+Generator    ->      API             :   Forespør generering av Terraform-kode
+API          -->     Generator       :   Returnerer generert Terraform-kode
+
+' Terraform validering '
+loop Opptil N forsøk (brukerdefinert terskel)
+    Generator   ->      Generator   :   Kører verifisering og validering
 end loop
 
-alt Verification Successful
-    Generator   ->      Backend     :   Sends complete terraform code
-    Backend     -->     Frontend    :   Sends complete terraform code
-    Frontend    -->     User        :   Display complete terraform code
-    User        ->      Frontend    :   Accept / Verify Code
-    Frontend    ->      Backend     :   Post:/add
-    Backend     ->      Database    :   Add complete terraform code\nto log/database
-else Verification threshold reached
-    Generator   -->     Frontend    :   Verification failed message
-    Frontend    -->     User        :   Display "Verification Failed" message
+alt Verifisering vellykket
+    Generator   ->      Backend     :   Sender fullstendig Terraform-kode
+    Backend     -->     Frontend    :   Sender fullstendig Terraform-kode
+    Frontend    -->     Bruker      :   Viser fullstendig Terraform-kode
+    Bruker      ->      Frontend    :   Godkjenn / Avslå kode
+    alt Bruker godtar IaC
+        Frontend    ->      Backend         :   Bekrefter godkjenning av kode
+        Backend     ->      Database        :   Lagrer godkjent IaC
+        Bruker      ->      Frontend        :   Forespør distribusjon av IaC til Azure
+        Frontend    ->      Backend         :   Sender distribusjonsforespørsel
+        Backend     ->      Azure           :   Distribuerer IaC
+        alt Distribusjon vellykket
+            Azure       ->      Backend         :   Bekrefter distribusjon
+            Backend     ->      Frontend        :   Bekrefter distribusjon
+            Frontend    -->     Bruker          :   Viser suksessmelding
+        else Distribusjon feilet
+            Azure       ->      Backend         :   Feilmelding
+            Backend     ->      Frontend        :   Sender feilmelding
+            Frontend    -->     Bruker          :   Viser feilmelding og ber om ny handling
+        end
+    else Bruker avviser IaC
+        Bruker      ->      Frontend        :   Forespør ny generering
+        Frontend    ->      Backend         :   Starter genereringsprosessen på nytt
+    end
+else Verifiseringsterskel nådd
+    Generator   -->     Frontend    :   Verifisering feilet-melding
+    Frontend    -->     Bruker      :   Viser "Verifisering feilet"-melding
 end alt
 
 @enduml

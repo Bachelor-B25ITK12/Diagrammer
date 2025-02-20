@@ -1,0 +1,158 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+/' TODO:    Gå gjennom og se hvilke metoder som
+            skal være public (+) og hvilke som skal være private (-)
+
+   TODO:    Gå gjennom og bytt String til string
+
+   TODO:    Gå gjennom og se på instansvariabler:
+            1) private instansvariabler skal starte med liten bokstav + camelCase
+            2) public instansvariabler (properties) skal starte med Stor bokstav + PascalCase
+'/
+
+class Project {
+    ' Instansvariabler '
+    String  ProjectName
+    String  NamingStandard
+    Resource[] Resources
+    String ProjectPath
+    ' Metoder '
+    Void ApplyNamingStandard()
+    Void SaveProject(String path)
+}
+
+' TODO: Skrive datatyper på parameter
+class NamingStandard {
+    'Instans variabler'
+    String[] Order
+    char Seperator
+    ' Metoder '
+    String GenerateResourceName(appName, env, location, resourceType)
+
+}
+
+/' TODO:    Skrive navn på parameter på Destroy().
+            Hva er string-en? Er det en path?
+            Er alle returtypene void?
+'/
+class TerraformExecutor{
+    'Instans variabler'
+
+    ' Metoder '
+    void Plan(Project project)
+    void Apply(Project project)
+    void Destroy(String string)
+}
+
+/' TODO:     Dobbeltsjekke at dette er riktig.
+            Skal det egentlig være en klasse eller er interface greit?
+'/
+interface TerraformController{
+    ' Metoder '
+    +POST /generate
+    +POST /apply
+
+}
+
+
+' TODO: Er String[] riktig?
+class TerraformPlanResult{
+    String[] changes
+    String[] warnings
+}
+
+' TODO: Er String[] riktig?
+class TerraformApplyResult{
+    String[] Success
+    String[] Errors
+}
+
+' TODO: Er String riktig datatype på UserSession?
+class AzureResourceManager{
+    bool CheckSubscription(String UserSession)
+
+}
+
+' TODO: Igjen, er String riktig datatype?
+' TODO: er void riktig returtype på login? Bør det være en string med "success" eller lignende?
+class AzureAuthService{
+   + void Login(String UserSession)
+   + void RefreshToken(String UserSession)
+}
+
+
+/' TODO:     Dobbeltsjekke at dette er riktig.
+            Skal det egentlig være en klasse eller er interface greit?
+'/
+interface AuthController{
+    +POST /login
+}
+
+' TODO: Dobbeltsjekk datatyper
+class UserSession{
+    - string tenantId
+    - string subscriptionId
+    - string ResourceGroup
+}
+
+
+class Logger{
+    - string LoggerPath
+    + void LogInfo(string info)
+    + void LogError(string error, Exception exception)
+}
+
+class Resource{
+    - string resourceName
+    - Module[] modules
+}
+
+class Module{
+    - string moduleName
+    - Dictionary<string, string> files
+    - Dictionary<string, string> variables
+}
+
+class ProjectManager{
+    Resource[] resources
+    + void AddResource(Resource resource)
+    + void RemoveResource(Resource resource)
+}
+
+class ResourceManager{
+    - Modules[] modules
+    + void AddModule()
+    + void RemoveModule()
+}
+
+' Kun for KI-versjonen '
+' TODO: gi navn på stringen i parameteret
+class LLMService{
+    + ValidationResult AnalyzeTerraform(Project project)
+    + string AutoGenerateTerraform(string string)
+}
+
+class OpenAiService{
+    + string SendRequestToAPI(string request)
+}
+
+' TODO: gi navn på stringene i parameteret
+class TerraformFactory{
+    + Resource ConvertResponse(string string, string string)
+}
+
+' TODO: skal disse være private eller public? og er string[] riktig på suggestions?
+class ValidationResult{
+    boolean isValid
+    string[] suggestions
+}
+
+exception       InvalidNamingStandardException
+exception       InvalidSeparatorException
+exception       TerraformExecutionException
+exception       AzureAuthenticationException
+
+'    TODO: skriv KOBLINGER mellom klasser/exceptions/interface under her ____
+
+@enduml

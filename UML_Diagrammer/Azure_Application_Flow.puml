@@ -1,0 +1,12 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor           User            as User
+participant     Frontend        as Frontend
+participant     Backend         as Backend
+participant     Azure           as Azure
+
+
+
+
+@enduml
