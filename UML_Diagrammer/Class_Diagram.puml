@@ -1,95 +1,85 @@
 @startuml
 'https://plantuml.com/class-diagram
 
-/' TODO:    Gå gjennom og se hvilke metoder som
-            skal være public (+) og hvilke som skal være private (-)
-
-   TODO:    Gå gjennom og bytt String til string
-
-   TODO:    Gå gjennom og se på instansvariabler:
+/'
+    INFO     Instansvariabler:
             1) private instansvariabler skal starte med liten bokstav + camelCase
             2) public instansvariabler (properties) skal starte med Stor bokstav + PascalCase
 '/
 
 class Project {
-    ' Instansvariabler '
-    String  ProjectName
-    String  NamingStandard
-    Resource[] Resources
-    String ProjectPath
-    ' Metoder '
-    Void ApplyNamingStandard()
-    Void SaveProject(String path)
+    - string projectName
+    - NamingStandard namingStandard
+    - Resource[] resources
+    - string projectPath
+    - Void applyNamingStandard()
+    - Void saveProject(String path)
 }
 
-' TODO: Skrive datatyper på parameter
+interface IGenerator {
+    // TODO Fill in
+}
+
 class NamingStandard {
-    'Instans variabler'
-    String[] Order
-    char Seperator
-    ' Metoder '
-    String GenerateResourceName(appName, env, location, resourceType)
+    - string[] Order
+    - char Seperator
+    - string GenerateResourceName(string appName, string env,
+          string location, string resourceType, string index)
 
 }
 
-/' TODO:    Skrive navn på parameter på Destroy().
-            Hva er string-en? Er det en path?
-            Er alle returtypene void?
-'/
 class TerraformExecutor{
-    'Instans variabler'
-
-    ' Metoder '
-    void Plan(Project project)
-    void Apply(Project project)
-    void Destroy(String string)
+    - TerraformResult Plan(Project project)
+    - TerraformResult Apply(Project project)
+    - TerraformResult Destroy(Project project)
 }
 
-/' TODO:     Dobbeltsjekke at dette er riktig.
-            Skal det egentlig være en klasse eller er interface greit?
-'/
-interface TerraformController{
-    ' Metoder '
+interface ITerraformController{
+    +POST /init
     +POST /generate
     +POST /apply
-
+    +POST /validate
+    ' TODO: vurdere å ha med +POST /plan og +POST /init
 }
 
-
-' TODO: Er String[] riktig?
-class TerraformPlanResult{
-    String[] changes
-    String[] warnings
+class TerraformController implements ITerraformController{
+    - TerraformResult initiate()
+    - TerraformResult generate()
+    - TerraformResult apply()
+    - TerraformResult validate()
+    /' TODO: vurdere om vi skal kjøre kommandoene i applikasjonen eller i temporaryFiles.
+          må vurderes etter vi finner ut hvordan vi håndterer State-filer '/
 }
 
-' TODO: Er String[] riktig?
-class TerraformApplyResult{
-    String[] Success
-    String[] Errors
+' TODO: lag en TerraformController klasse her (da vi kun har interface nå)____
+
+class TerraformResult{
+    - bool isSuccessful
+    - Dictionary<errorCode, errorMessage> resultMessage
 }
 
-' TODO: Er String riktig datatype på UserSession?
 class AzureResourceManager{
-    bool CheckSubscription(String UserSession)
+    - bool CheckSubscription(string UserSession)
 
 }
 
-' TODO: Igjen, er String riktig datatype?
-' TODO: er void riktig returtype på login? Bør det være en string med "success" eller lignende?
 class AzureAuthService{
-   + void Login(String UserSession)
-   + void RefreshToken(String UserSession)
+   - void Login(string UserSession)
+   - void RefreshToken(string UserSession)
 }
 
 
 /' TODO:     Dobbeltsjekke at dette er riktig.
             Skal det egentlig være en klasse eller er interface greit?
 '/
-interface AuthController{
-    +POST /login
+interface IAuthController{
+    + POST /login
 }
 
-' TODO: Dobbeltsjekk datatyper
+class AuthController implements IAuthController{
+    + void AzureLogin()
+}
+
 class UserSession{
     - string tenantId
     - string subscriptionId
@@ -114,8 +104,7 @@ class Module{
     - Dictionary<string, string> variables
 }
 
-class ProjectManager{
-    Resource[] resources
+class ProjectManager implements IGenerator{
     + void AddResource(Resource resource)
     + void RemoveResource(Resource resource)
 }
@@ -124,13 +113,13 @@ class ResourceManager{
     - Modules[] modules
     + void AddModule()
     + void RemoveModule()
+    + Resource CreateResource()
 }
 
 ' Kun for KI-versjonen '
-' TODO: gi navn på stringen i parameteret
-class LLMService{
+class LLMService implements IGenerator{
     + ValidationResult AnalyzeTerraform(Project project)
-    + string AutoGenerateTerraform(string string)
+    + string AutoGenerateTerraform(string prompt)
 }
 
 class OpenAiService{
@@ -138,14 +127,14 @@ class OpenAiService{
 }
 
 ' TODO: gi navn på stringene i parameteret
+' skal konvertere svar fra LLM til fungerende modul/ressurs
 class TerraformFactory{
     + Resource ConvertResponse(string string, string string)
 }
 
-' TODO: skal disse være private eller public? og er string[] riktig på suggestions?
 class ValidationResult{
-    boolean isValid
-    string[] suggestions
+    - boolean isValid
+    - string suggestions
 }
 
 exception       InvalidNamingStandardException
@@ -154,5 +143,20 @@ exception       TerraformExecutionException
 exception       AzureAuthenticationException
 
 '    TODO: skriv KOBLINGER mellom klasser/exceptions/interface under her ____
+Project                     -->             Resource
+Project                     -->             NamingStandard
+Resource                    -->             Module
+Resource                    ..>             ProjectManager
+ResourceManager             -->             Module
+ResourceManager             -->             Resource
+' Dobbeltsjekke kobling under ?
+NamingStandard              ..>             Project
+Project                     ..>             TerraformExecutor
+TerraformExecutor           ..>             TerraformResult
+
+UserService                 -->             AzureAuthService
+AuthController              -->             AzureAuthService
+AzureAuthService            -->             AzureResourceManager
+
 
 @enduml
