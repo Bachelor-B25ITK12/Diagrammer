@@ -1,0 +1,46 @@
+@startuml
+title Sekvensdiagram for LLM-versjonen av applikasjonen
+
+actor           Bruker          as  Bruker
+participant     Frontend        as  Frontend
+participant     Backend         as  Backend
+participant     Generator       as  Generator
+participant     API             as  API
+participant     Azure           as  Azure
+database        Database        as  Database
+
+Bruker        ->      Frontend        :   Velger PaaS (App Service)
+Frontend      ->      Backend         :   Forespør valgt PaaS
+Backend       ->      Backend         :   Finner riktige inputfelter for PaaS
+Backend       ->      Frontend        :   Sender riktige inputfelter
+Frontend      -->     Bruker          :   Vist inputfeltene til bruker
+Bruker        ->      Frontend        :   Bruker fyller ut inputfeltene
+Frontend      ->      Backend         :   Sender innputtdata
+Backend       ->      Generator       :   Sender inputdata med instruksjoner
+
+' Kommunikasjon med LLM API for generering av Terraform-kode '
+Generator    ->      API             :   Forespør generering av Terraform-kode
+API          -->     Generator       :   Returnerer generert Terraform-kode
+
+' Terraform validering '
+loop Opptil N forsøk (brukerdefinert terskel)
+    Generator   ->      Generator   :   Kører verifisering og validering
+end loop
+
+' Verifisering vellykket '
+    Generator   ->      Backend     :   verifisering vellykket: Sender fullstendig Terraform-kode
+    Backend     -->     Frontend    :   Sender fullstendig Terraform-kode
+    Frontend    -->     Bruker      :   Viser fullstendig Terraform-kode
+    Bruker      ->      Frontend    :   Godkjenn kode
+' Etter godkjenning av IaC '
+Frontend    ->      Backend         :   Bekrefter godkjenning av kode
+Backend     ->      Database        :   Lagrer godkjent IaC
+Bruker      ->      Frontend        :   Forespør distribusjon av IaC til Azure
+Frontend    ->      Backend         :   Sender distribusjonsforespørsel
+Backend     ->      Azure           :   Distribuerer IaC
+
+' Distribusjon feiler '
+Azure       ->      Backend         :   Distribusjon feilet
+Backend     ->      Frontend        :   Sender feilmelding
+Frontend    -->     Bruker          :   Viser feilmelding
+@enduml
