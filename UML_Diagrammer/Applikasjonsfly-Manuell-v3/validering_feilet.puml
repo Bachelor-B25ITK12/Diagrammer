@@ -27,6 +27,4 @@ Backend       -->     Frontend        :   Sender feilmelding
 Frontend      -->     Bruker          :   Viser feilmelding
 
 
-Bruker        ->      Frontend        :   Forespør ny generering / Avslutter
-
 @enduml

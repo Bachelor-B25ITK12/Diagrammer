@@ -1,5 +1,5 @@
 @startuml
-title Scenario 1: Brukeren godtar Terraform-kode og distribusjonen lykkes
+title Scenario 1: Brukeren godtar verifisert Terraform-kode og distribusjonen lykkes
 
 actor Bruker as Bruker
 participant Frontend as Frontend

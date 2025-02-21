@@ -1,5 +1,5 @@
 @startuml
-title Scenario 2: Brukeren godtar Terraform-kode, men distribusjonen feiler
+title Scenario 2: Brukeren godtar verifisert Terraform-kode, men distribusjonen feiler
 
 actor Bruker as Bruker
 participant Frontend as Frontend
@@ -32,7 +32,7 @@ Bruker        ->      Frontend        :   Forespør distribusjon
 Frontend      ->      Backend         :   Sender distribusjonsforespørsel
 Backend       ->      Azure           :   Distribuerer Terraform-kode
 
-Azure         ->      Backend         :   Feilmelding
+Azure         ->      Backend         :   Aviser distribusjon
 Backend       ->      Frontend        :   Sender feilmelding
 Frontend      -->     Bruker          :   Viser feilmelding og ber om ny handling
 

@@ -1,11 +1,11 @@
 @startuml
-title Scenario 1: Brukeren godtar Terraform-kode og distribusjonen lykkes
+title Scenario 1: Brukeren godtar verifisert Terraform-kode og distribusjonen lykkes
 
 actor           Bruker          as  Bruker
 participant     Frontend        as  Frontend
 participant     Backend         as  Backend
 participant     Generator       as  Generator
-participant     API             as  API
+participant     OpenAI_API             as  OpenAI_API
 participant     Azure           as  Azure
 database        Database        as  Database
 
@@ -18,29 +18,28 @@ Bruker        ->      Frontend        :   Bruker fyller ut inputfeltene
 Frontend      ->      Backend         :   Sender innputtdata
 Backend       ->      Generator       :   Sender inputdata med instruksjoner
 
-' Kommunikasjon med LLM API for generering av Terraform-kode '
-Generator    ->      API             :   Forespør generering av Terraform-kode
-API          -->     Generator       :   Returnerer generert Terraform-kode
 
-' Terraform validering '
+Generator    ->      OpenAI_API             :   Forespør generering av Terraform-kode
+OpenAI_API          -->     Generator       :   Returnerer generert Terraform-kode
+
+
 loop Opptil N forsøk (brukerdefinert terskel)
     Generator   ->      Generator   :   Kører verifisering og validering
 end loop
 
-' Verifisering vellykket '
-    Generator   ->      Backend     :   verifisering vellykket: Sender fullstendig Terraform-kode
+    Generator   ->      Backend     :   Sender fullstendig Terraform-kode
     Backend     -->     Frontend    :   Sender fullstendig Terraform-kode
     Frontend    -->     Bruker      :   Viser fullstendig Terraform-kode
     Bruker      ->      Frontend    :   Godkjenn kode
-' Etter godkjenning av IaC '
+
 Frontend    ->      Backend         :   Bekrefter godkjenning av kode
 Backend     ->      Database        :   Lagrer godkjent Terraform-kode
 Bruker      ->      Frontend        :   Forespør distribusjon av Terraform-kode til Azure
 Frontend    ->      Backend         :   Sender distribusjonsforespørsel
 Backend     ->      Azure           :   Distribuerer Terraform-kode
 
-' Distribusjon vellykket '
-Azure       ->      Backend         :   Bekrefter distribusjon
-            Backend     ->      Frontend        :   Bekrefter distribusjon
-            Frontend    -->     Bruker          :   Viser suksessmelding
+
+   Azure       ->      Backend         :   Bekrefter distribusjon
+   Backend     ->      Frontend        :   Bekrefter distribusjon
+   Frontend    -->     Bruker          :   Viser suksessmelding
 @enduml

@@ -25,7 +25,8 @@ loop Opptil N forsøk
 end loop
 
 alt Verifisering feilet
-    Generator --> Frontend : Verifisering feilet-melding
-    Frontend --> Bruker : Viser "Verifisering feilet"-melding
+    Generator --> Backend : Feilmelding fra verifisering
+    Backend --> Frontend : Sender feilmelding
+    Frontend --> Bruker : Viser feilmelding
 end
 @enduml

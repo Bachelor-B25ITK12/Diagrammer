@@ -1,5 +1,5 @@
 @startuml
-title Scenario 3: Brukeren avviser Terraform-kode og starter genereringen på nytt
+title Scenario 3: Brukeren avviser verifisert Terraform-kode
 
 actor Bruker as Bruker
 participant Frontend as Frontend
