@@ -1,5 +1,5 @@
 @startuml
-title Sekvensdiagram for LLM-versjonen av applikasjonen
+title Scenario 2: Brukeren godtar Terraform-kode, men distribusjonen feiler
 
 actor           Bruker          as  Bruker
 participant     Frontend        as  Frontend
@@ -32,12 +32,12 @@ end loop
     Backend     -->     Frontend    :   Sender fullstendig Terraform-kode
     Frontend    -->     Bruker      :   Viser fullstendig Terraform-kode
     Bruker      ->      Frontend    :   Godkjenn kode
-' Etter godkjenning av IaC '
+' Etter godkjenning av Terraform-kode'
 Frontend    ->      Backend         :   Bekrefter godkjenning av kode
-Backend     ->      Database        :   Lagrer godkjent IaC
-Bruker      ->      Frontend        :   Forespør distribusjon av IaC til Azure
+Backend     ->      Database        :   Lagrer godkjent Terraform-kode
+Bruker      ->      Frontend        :   Forespør distribusjon av Terraform-kode til Azure
 Frontend    ->      Backend         :   Sender distribusjonsforespørsel
-Backend     ->      Azure           :   Distribuerer IaC
+Backend     ->      Azure           :   Distribuerer Terraform-kode
 
 ' Distribusjon feiler '
 Azure       ->      Backend         :   Distribusjon feilet

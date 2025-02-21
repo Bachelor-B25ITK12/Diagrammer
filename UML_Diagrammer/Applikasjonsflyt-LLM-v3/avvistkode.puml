@@ -1,11 +1,13 @@
 @startuml
+
 actor Bruker as Bruker
 participant Frontend as Frontend
 participant Backend as Backend
 participant Generator as Generator
 participant OpenAI_API as OpenAI_API
 
-title Generering med verifisering som feiler
+title Scenario 3: Brukeren avviser Terraform-kode og starter genereringen på nytt
+
 
 Bruker -> Frontend : Velger PaaS (App Service)
 Frontend -> Backend : Forespør valgt PaaS
@@ -16,6 +18,7 @@ Bruker -> Frontend : Bruker fyller ut inputfeltene
 Frontend -> Backend : Sender inputdata
 Backend -> Generator : Sender inputdata med instruksjoner
 
+
 Generator -> OpenAI_API : Forespør generering av Terraform-kode
 OpenAI_API --> Generator : Returnerer generert Terraform-kode
 
@@ -24,8 +27,11 @@ loop Opptil N forsøk
     Generator -> Generator : Kjører verifisering og validering
 end loop
 
-alt Verifisering feilet
-    Generator --> Frontend : Verifisering feilet-melding
-    Frontend --> Bruker : Viser "Verifisering feilet"-melding
+alt Verifisering vellykket
+    Generator -> Backend : Sender fullstendig Terraform-kode
+    Backend --> Frontend : Sender fullstendig Terraform-kode
+    Frontend --> Bruker : Viser fullstendig Terraform-kode
+    Bruker -> Frontend : Avviser Terraform-kode
+
 end
 @enduml

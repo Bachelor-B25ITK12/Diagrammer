@@ -1,0 +1,32 @@
+@startuml
+title Scenario 4: Verifisering feiler og brukeren får feilmelding
+
+actor Bruker as Bruker
+participant Frontend as Frontend
+participant Backend as Backend
+participant Generator as Generator
+database Database as Database
+
+Bruker        ->      Frontend        :   Velger PaaS (App Service)
+Frontend      ->      Backend         :   Forespør valgt PaaS
+Backend       ->      Backend         :   Finner riktige inputfelter
+Backend       ->      Frontend        :   Sender inputfelter
+Frontend      -->     Bruker          :   Viser inputfeltene
+Bruker        ->      Frontend        :   Fyller ut inputfeltene
+Frontend      ->      Backend         :   Sender inputdata
+Backend       ->      Generator       :   Sender instruksjoner
+
+Generator     ->      Database        :   Forespør moduler
+Database      -->     Generator       :   Returnerer moduler
+Generator     ->      Generator       :   Genererer Terraform-kode
+
+
+Generator     ->      Generator       :   Kjører verifisering (feiler)
+Generator     -->     Backend         :   Feilmelding fra verifisering
+Backend       -->     Frontend        :   Sender feilmelding
+Frontend      -->     Bruker          :   Viser feilmelding
+
+
+Bruker        ->      Frontend        :   Forespør ny generering / Avslutter
+
+@enduml
