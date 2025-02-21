@@ -21,12 +21,12 @@ OpenAI_API --> Generator : Returnerer generert Terraform-kode
 
 
 loop Opptil N forsøk
-Generator -> Generator : Kjører verifisering og validering
+Generator -> Generator : Kjører verifisering og validering(feiler)
 end loop
 
-alt Verifisering feilet
+
 Generator --> Backend : Feilmelding fra verifisering
 Backend --> Frontend : Sender feilmelding
 Frontend --> Bruker : Viser feilmelding
-end
+
 @enduml
