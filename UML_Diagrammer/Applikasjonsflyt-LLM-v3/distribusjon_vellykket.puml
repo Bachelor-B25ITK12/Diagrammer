@@ -5,7 +5,7 @@ actor           Bruker          as  Bruker
 participant     Frontend        as  Frontend
 participant     Backend         as  Backend
 participant     Generator       as  Generator
-participant     OpenAI_API             as  OpenAI_API
+participant     OpenAI_API      as  OpenAI_API
 participant     Azure           as  Azure
 database        Database        as  Database
 
@@ -19,18 +19,18 @@ Frontend      ->      Backend         :   Sender innputtdata
 Backend       ->      Generator       :   Sender inputdata med instruksjoner
 
 
-Generator    ->      OpenAI_API             :   Forespør generering av Terraform-kode
-OpenAI_API          -->     Generator       :   Returnerer generert Terraform-kode
+Generator    ->      OpenAI_API      :   Forespør generering av Terraform-kode
+OpenAI_API   -->     Generator       :   Returnerer generert Terraform-kode
 
 
 loop Opptil N forsøk (brukerdefinert terskel)
-    Generator   ->      Generator   :   Kører verifisering og validering
+Generator   ->      Generator   :   Kører verifisering og validering
 end loop
 
-    Generator   ->      Backend     :   Sender fullstendig Terraform-kode
-    Backend     -->     Frontend    :   Sender fullstendig Terraform-kode
-    Frontend    -->     Bruker      :   Viser fullstendig Terraform-kode
-    Bruker      ->      Frontend    :   Godkjenn kode
+Generator   ->      Backend     :   Sender fullstendig Terraform-kode
+Backend     -->     Frontend    :   Sender fullstendig Terraform-kode
+Frontend    -->     Bruker      :   Viser fullstendig Terraform-kode
+Bruker      ->      Frontend    :   Godkjenn kode
 
 Frontend    ->      Backend         :   Bekrefter godkjenning av kode
 Backend     ->      Database        :   Lagrer godkjent Terraform-kode
@@ -39,7 +39,7 @@ Frontend    ->      Backend         :   Sender distribusjonsforespørsel
 Backend     ->      Azure           :   Distribuerer Terraform-kode
 
 
-   Azure       ->      Backend         :   Bekrefter distribusjon
-   Backend     ->      Frontend        :   Bekrefter distribusjon
-   Frontend    -->     Bruker          :   Viser suksessmelding
+Azure       ->      Backend         :   Bekrefter distribusjon
+Backend     ->      Frontend        :   Bekrefter distribusjon
+Frontend    -->     Bruker          :   Viser suksessmelding
 @enduml

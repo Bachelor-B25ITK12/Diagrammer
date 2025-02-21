@@ -24,14 +24,14 @@ OpenAI_API --> Generator : Returnerer generert Terraform-kode
 
 
 loop Opptil N forsøk
-    Generator -> Generator : Kjører verifisering og validering
+Generator -> Generator : Kjører verifisering og validering
 end loop
 
 
-    Generator -> Backend : fullstendig Terraform-kode
-    Backend --> Frontend : Sender fullstendig Terraform-kode
-    Frontend --> Bruker : Viser fullstendig Terraform-kode
-    Bruker -> Frontend : Avviser Terraform-kode
+Generator -> Backend : fullstendig Terraform-kode
+Backend --> Frontend : Sender fullstendig Terraform-kode
+Frontend --> Bruker : Viser fullstendig Terraform-kode
+Bruker -> Frontend : Avviser Terraform-kode
 
 
 @enduml
