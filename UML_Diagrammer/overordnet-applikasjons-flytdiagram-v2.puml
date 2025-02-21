@@ -13,7 +13,7 @@ package "Generatorer" {
 FE -> BE : (1)\nBruker velger PaaS og Sender utfylt inputfelter
 BE --> G1 : (2)\nSender instruksjoner
 G1 --> BE : (3)\nSender generert IaC
-BE -> FE : (4)\nVidere sender generert IaC
+BE -> FE : (4)\nVideresender generert IaC
 BE -> DB : (5)\nGodkjent kode lagres
 BE -> AZ :(6)\nGodkjent kode utplasseres
 @enduml
