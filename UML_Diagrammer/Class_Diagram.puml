@@ -143,20 +143,33 @@ exception       TerraformExecutionException
 exception       AzureAuthenticationException
 
 '    TODO: skriv KOBLINGER mellom klasser/exceptions/interface under her ____
-Project                     -->             Resource
-Project                     -->             NamingStandard
-Resource                    -->             Module
-Resource                    ..>             ProjectManager
-ResourceManager             -->             Module
-ResourceManager             -->             Resource
+Project                     -->    Resource                         :   Contains resource
+Project                     -->    NamingStandard                   :   Uses
+Resource                    -->    Module                           :   Contains modules
+Resource                    ..>    ProjectManager                   :   Adds resource to project
+ResourceManager             -->    Module
+ResourceManager             -->    Resource                         :   Validates
 ' Dobbeltsjekke kobling under ?
-NamingStandard              ..>             Project
-Project                     ..>             TerraformExecutor
-TerraformExecutor           ..>             TerraformResult
+NamingStandard              ..>     Project                         :   Applies Standard
+Project                     ..>     TerraformExecutor               :   Executes
+TerraformExecutor           ..>     TerraformResult                 :   Produces
+UserSession                 -->     AzureAuthService                :   Logs in with
+AuthController              -->     AzureAuthService                :   Authenticates
+AzureAuthService            -->     AzureResourceManager            :   Grants access
+AzureResourceManager        ..>     Project                         :   Checks
+NamingStandard              ..>     InvalidNamingStandardException  :   Throws/Catches Exception
+NamingStandard              ..>     InvalidSeparatorException       :   Throws/Catches Exception
+TerraformExecutor           ..>     TerraformExecutionException     :   Throws/Catches Exception
 
-UserService                 -->             AzureAuthService
-AuthController              -->             AzureAuthService
-AzureAuthService            -->             AzureResourceManager
+' TODO: Dobbeltsjekke alt under denne linjen
+TerraformController         ..>     Project                         :   Calls
+UserSession                 ..>     Project                         :   Defines
+'Under er kun for LLM-versjon
+Project                     -->     LLMService                      :   Validates
+LLMService                  -->     TerraformFactory                :   Creates module
+LLMService                  -->     OpenAiService                   :   Calls API
+OpenAiService               -->     ValidationResult                :   Returns
+LLMService                  -->     ValidationResult                :   Returns
 
 
 @enduml
