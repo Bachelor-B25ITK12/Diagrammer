@@ -12,8 +12,8 @@ class Project {
     - NamingStandard namingStandard
     - Resource[] resources
     - string projectPath
-    - Void applyNamingStandard()
-    - Void saveProject(String path)
+    - Void applyNamingStandard(string namingStandard)
+    - Void saveProject(string path)
 }
 
 interface IGenerator {
