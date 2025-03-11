@@ -10,10 +10,10 @@
 class Project {
     - string projectName
     - NamingStandard namingStandard
-    - Resource[] resources
+    - Module[] modules
     - string projectPath
-    - Void applyNamingStandard()
-    - Void saveProject(String path)
+    - Void applyNamingStandard(string namingStandard)
+    - Void saveProject(string path)
 }
 
 interface IGenerator {
@@ -93,27 +93,27 @@ class Logger{
     + void LogError(string error, Exception exception)
 }
 
-class Resource{
-    - string resourceName
-    - Module[] modules
+class Module{
+    - string ModuleName
+    - Resource[] Resources
 }
 
-class Module{
-    - string moduleName
+class Resource{
+    - string ResourceName
     - Dictionary<string, string> files
     - Dictionary<string, string> variables
 }
 
 class ProjectManager implements IGenerator{
-    + void AddResource(Resource resource)
-    + void RemoveResource(Resource resource)
+    + void AddModule(Module module)
+    + void RemoveModule(Module module)
 }
 
-class ResourceManager{
-    - Modules[] modules
-    + void AddModule()
-    + void RemoveModule()
-    + Resource CreateResource()
+class ModuleManager{
+    - Resource[] resource
+    + void AddResource()
+    + void RemoveResource()
+    + Resource CreateModule()
 }
 
 ' Kun for KI-versjonen '
@@ -130,11 +130,16 @@ class OpenAiService{
 ' skal konvertere svar fra LLM til fungerende modul/ressurs
 class TerraformFactory{
     + Resource ConvertResponse(string string, string string)
+    + ArrayList<string> ReadTerraformResource(string filepath)
+
 }
 
 class ValidationResult{
     - boolean isValid
     - string suggestions
+}
+
+entity ResourceDirectory {
 }
 
 exception       InvalidNamingStandardException
@@ -143,20 +148,35 @@ exception       TerraformExecutionException
 exception       AzureAuthenticationException
 
 '    TODO: skriv KOBLINGER mellom klasser/exceptions/interface under her ____
-Project                     -->             Resource
-Project                     -->             NamingStandard
-Resource                    -->             Module
-Resource                    ..>             ProjectManager
-ResourceManager             -->             Module
-ResourceManager             -->             Resource
+Project                     -->    Module                         :   Contains modules
+Project                     -->    NamingStandard                   :   Uses
+Module                    -->    Resource                           :   Contains resource
+Module                    ..>    ProjectManager                   :   Adds module to project
+ModuleManager             -->    Resource
+ModuleManager             -->    Module                         :   Validates
 ' Dobbeltsjekke kobling under ?
-NamingStandard              ..>             Project
-Project                     ..>             TerraformExecutor
-TerraformExecutor           ..>             TerraformResult
+NamingStandard              ..>     Project                         :   Applies Standard
+Project                     ..>     TerraformExecutor               :   Executes
+TerraformExecutor           ..>     TerraformResult                 :   Produces
+UserSession                 -->     AzureAuthService                :   Logs in with
+AuthController              -->     AzureAuthService                :   Authenticates
+AzureAuthService            -->     AzureResourceManager            :   Grants access
+AzureResourceManager        ..>     Project                         :   Checks
+NamingStandard              ..>     InvalidNamingStandardException  :   Throws/Catches Exception
+NamingStandard              ..>     InvalidSeparatorException       :   Throws/Catches Exception
+TerraformExecutor           ..>     TerraformExecutionException     :   Throws/Catches Exception
+TerraformFactory            ..>     ResourceDirectory               :   Retrieves resources
+TerraformFactory            ..>     Resource                        :   Creates resources
 
-UserService                 -->             AzureAuthService
-AuthController              -->             AzureAuthService
-AzureAuthService            -->             AzureResourceManager
+' TODO: Dobbeltsjekke alt under denne linjen
+TerraformController         ..>     Project                         :   Calls
+UserSession                 ..>     Project                         :   Defines
+'Under er kun for LLM-versjon
+Project                     -->     LLMService                      :   Validates
+LLMService                  -->     TerraformFactory                :   Creates module
+LLMService                  -->     OpenAiService                   :   Calls API
+OpenAiService               -->     ValidationResult                :   Returns
+LLMService                  -->     ValidationResult                :   Returns
 
 
 @enduml
