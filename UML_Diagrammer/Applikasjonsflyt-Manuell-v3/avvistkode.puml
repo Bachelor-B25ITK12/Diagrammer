@@ -7,8 +7,8 @@ participant Backend as Backend
 participant Generator as Generator
 database Database as Database
 
-Bruker        ->      Frontend        :   Velger PaaS (App Service)
-Frontend      ->      Backend         :   Forespør valgt PaaS
+Bruker        ->      Frontend        :   Velger produkt (Standard App Service)
+Frontend      ->      Backend         :   Forespør valgt produkt
 Backend       ->      Backend         :   Finner riktige inputfelter
 Backend       ->      Frontend        :   Sender inputfelter
 Frontend      -->     Bruker          :   Viser inputfeltene
@@ -16,8 +16,8 @@ Bruker        ->      Frontend        :   Fyller ut inputfeltene
 Frontend      ->      Backend         :   Sender inputdata
 Backend       ->      Generator       :   Sender instruksjoner
 
-Generator     ->      Database        :   Forespør moduler
-Database      -->     Generator       :   Returnerer moduler
+Generator     ->      Database        :   Forespør moduler/ressurser
+Database      -->     Generator       :   Returnerer moduler/ressurser
 Generator     ->      Generator       :   Genererer og verifiserer Terraform-kode
 Generator     -->     Backend         :   Sender komplett Terraform-kode
 

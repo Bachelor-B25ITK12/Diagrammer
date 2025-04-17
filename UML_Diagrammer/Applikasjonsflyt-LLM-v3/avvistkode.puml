@@ -6,18 +6,12 @@ participant Backend as Backend
 participant Generator as Generator
 participant OpenAI_API as OpenAI_API
 
-title Scenario 3: Brukeren avviser verifisert Terraform-kode
+title Scenario 2: Brukeren avviser verifisert Terraform-kode
 
 
-Bruker -> Frontend : Velger PaaS (App Service)
-Frontend -> Backend : Forespør valgt PaaS
-Backend -> Backend : Finner riktige inputfelter for PaaS
-Backend -> Frontend : Sender riktige inputfelter
-Frontend --> Bruker : Vist inputfeltene til bruker
-Bruker -> Frontend : Bruker fyller ut inputfeltene
-Frontend -> Backend : Sender inputdata
-Backend -> Generator : Sender inputdata med instruksjoner
-
+Bruker -> Frontend : Velger ressurstype (azurerm_web_app)
+Frontend -> Backend : Forespør valgt ressurs
+Backend -> Generator : Sender ressurstype med instruksjoner
 
 Generator -> OpenAI_API : Forespør generering av Terraform-kode
 OpenAI_API --> Generator : Returnerer generert Terraform-kode
